@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#092b35">
+    <title>Sea Roam</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="/style.css">
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <main>
+      <div id="map" aria-label="Interactive world map"></div>
+      <section class="panel" aria-labelledby="title">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">⌁</span>
+          <div>
+            <h1 id="title">Sea Roam</h1>
+            <p class="subtitle">A little boat, a very big world.</p>
+          </div>
+        </div>
+
+        <div class="readouts">
+          <div><span>Position</span><strong id="position">Loading map…</strong></div>
+          <div><span>Course</span><strong id="course">000°</strong></div>
+          <div><span>Speed</span><strong><span id="speed">0.0</span> kn</strong></div>
+        </div>
+
+        <div class="actions">
+          <button id="follow" type="button" aria-pressed="true">Following boat</button>
+          <button id="reset" type="button">Return to boat</button>
+        </div>
+
+        <div class="controls">
+          <span class="controls-title">Steer with your keyboard</span>
+          <div class="key-guide" aria-label="W or up arrow to move forward, S or down arrow to reverse, A or left arrow to turn left, D or right arrow to turn right">
+            <kbd>W</kbd><kbd>↑</kbd><span>throttle</span>
+            <kbd>A</kbd><kbd>←</kbd><span>turn left</span>
+            <kbd>S</kbd><kbd>↓</kbd><span>reverse</span>
+            <kbd>D</kbd><kbd>→</kbd><span>turn right</span>
+          </div>
+          <p>Hold a key to cruise. Explore the map by dragging it.</p>
+        </div>
+      </section>
+
+      <div class="touch-controls" aria-label="Boat controls">
+        <button type="button" data-control="left" aria-label="Turn left">←</button>
+        <div>
+          <button type="button" data-control="forward" aria-label="Move forward">↑</button>
+          <button type="button" data-control="reverse" aria-label="Reverse">↓</button>
+        </div>
+        <button type="button" data-control="right" aria-label="Turn right">→</button>
+      </div>
+      <div class="map-credit">Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</div>
+    </main>
+  </body>
+</html>
