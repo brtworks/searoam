@@ -2,7 +2,7 @@
   "use strict";
 
   const start = { lat: 37.805, lng: -122.43 };
-  const map = L.map("map", { zoomControl: false, worldCopyJump: true })
+  const map = L.map("map", { zoomControl: false, keyboard: false, worldCopyJump: true })
     .setView([start.lat, start.lng], 14);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
