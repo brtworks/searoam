@@ -162,7 +162,7 @@
   let swipeStart = null;
   window.addEventListener("scroll", () => debug("scroll event"), true);
   window.addEventListener("touchstart", (event) => {
-    if (dragMode) return;
+    if (dragMode || event.target.closest?.("#map, .panel, .touch-controls, .menu-toggle")) return;
     const t = event.touches[0];
     swipeStart = { x: t.clientX, y: t.clientY };
   }, { passive: true });
