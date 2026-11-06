@@ -63,6 +63,7 @@
   let maxSpeed = Number(speedSlider.value);
   let dragMode = true;
   let drag = null;
+  const cruise = true;
   const pointers = new Map();
   let heading = 0;
   let speed = 0;
@@ -107,6 +108,18 @@
   const actionFor = (event) =>
     keyActions.get(event.key) || codeActions.get(event.code) || keyCodeActions.get(event.keyCode);
 
+  // Titan-style keyboard touchpad: swipes arrive as arrow keys or wheel/scroll events.
+  function nudge(action, amount = 1) {
+    if (action === "left") heading = (heading - 12 * amount + 360) % 360;
+    else if (action === "right") heading = (heading + 12 * amount) % 360;
+    else if (action === "forward") speed = Math.min(speed + maxSpeed / 8 * amount, maxSpeed);
+    else if (action === "reverse") speed = Math.max(speed - maxSpeed / 8 * amount, -maxSpeed / 4);
+  }
+  const swipeKeys = new Map([
+    ["ArrowUp", "forward"], ["ArrowDown", "reverse"], ["ArrowLeft", "left"], ["ArrowRight", "right"]
+  ]);
+  const swipeKeyCodes = new Map([[38, "forward"], [40, "reverse"], [37, "left"], [39, "right"]]);
+
   window.addEventListener("keydown", (event) => {
     if (isEditable(event.target)) return;
     if (event.key === "m" || event.key === "M") { setMode(!dragMode); return; }
@@ -115,16 +128,24 @@
       spawnAt(spawns[Number(event.key) - 1]);
       return;
     }
-    const action = actionFor(event);
+    if (event.key === " " || event.key === "Enter") { event.preventDefault(); speed = 0; return; }
+    const action = swipeKeys.get(event.key) || swipeKeyCodes.get(event.keyCode);
     if (!action) return;
     event.preventDefault();
-    keysDown.add(action);
+    nudge(action);
   });
 
-  window.addEventListener("keyup", (event) => {
-    const action = actionFor(event);
-    if (action) keysDown.delete(action);
-  });
+  window.addEventListener("wheel", (event) => {
+    if (dragMode || isEditable(event.target)) return;
+    event.preventDefault();
+    const unit = event.deltaMode === 1 ? 1 : 1 / 40;
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+      nudge(event.deltaX > 0 ? "right" : "left", Math.min(Math.abs(event.deltaX) * unit, 3));
+    } else {
+      nudge(event.deltaY < 0 ? "forward" : "reverse", Math.min(Math.abs(event.deltaY) * unit, 3));
+    }
+  }, { passive: false });
+
   window.addEventListener("blur", clearInputs);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) clearInputs();
@@ -168,7 +189,7 @@
     pointers.clear();
     if (drive) map.dragging.disable(); else map.dragging.enable();
     mapElement.style.touchAction = drive ? "none" : "";
-    modeButton.textContent = drive ? "Mode: Touch steering (tap for keyboard)" : "Mode: Keyboard (tap for touch steering)";
+    modeButton.textContent = drive ? "Mode: Touch steering (tap for keyboard)" : "Mode: Keyboard swipe pad (tap for touch steering)";
     if (drive) keysDown.clear();
     modeButton.setAttribute("aria-pressed", String(drive));
   }
@@ -222,8 +243,9 @@
 
       if (active("forward")) speed = Math.min(speed + accel * elapsed, maxSpeed);
       else if (active("reverse")) speed = Math.max(speed - accel * elapsed, -maxSpeed / 4);
-      else if (speed > 0) speed = Math.max(0, speed - accel * elapsed);
-      else speed = Math.min(0, speed + accel * elapsed);
+      else if (!cruise) {
+        speed = speed > 0 ? Math.max(0, speed - accel * elapsed) : Math.min(0, speed + accel * elapsed);
+      }
     }
 
     const zoomScale = Math.pow(2, 14 - map.getZoom()) * 6;

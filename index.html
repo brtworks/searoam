@@ -8,9 +8,9 @@
     <link rel="icon" href="icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script defer src="app.js?v=4"></script>
+    <script defer src="app.js?v=5"></script>
   </head>
   <body>
     <main>
@@ -47,14 +47,14 @@
         </label>
 
         <div class="controls">
-          <span class="controls-title">Steer with your keyboard</span>
-          <div class="key-guide" aria-label="W or up arrow to move forward, S or down arrow to reverse, A or left arrow to turn left, D or right arrow to turn right">
-            <kbd>W</kbd><kbd>↑</kbd><span>throttle</span>
-            <kbd>A</kbd><kbd>←</kbd><span>turn left</span>
-            <kbd>S</kbd><kbd>↓</kbd><span>reverse</span>
-            <kbd>D</kbd><kbd>→</kbd><span>turn right</span>
+          <span class="controls-title">Keyboard mode: swipe on the keyboard</span>
+          <div class="key-guide" aria-label="Swipe up to speed up, down to slow, left or right to turn">
+            <kbd>↑</kbd><span>swipe up: faster</span>
+            <kbd>←</kbd><span>swipe left: turn left</span>
+            <kbd>↓</kbd><span>swipe down: slower</span>
+            <kbd>→</kbd><span>swipe right: turn right</span>
           </div>
-          <p>Press M to switch touch/keyboard mode. Press 1–9 to jump to a spawn point. Hold a key to cruise. Explore the map by dragging it.</p>
+          <p>Press M to switch touch/keyboard mode. Press 1–9 to jump to a spawn point. Boat keeps cruising; Space stops it.</p>
         </div>
       </section>
 
