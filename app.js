@@ -109,6 +109,8 @@
 
   window.addEventListener("keydown", (event) => {
     if (isEditable(event.target)) return;
+    if (event.key === "m" || event.key === "M") { setMode(!dragMode); return; }
+    if (dragMode) return;
     if (/^[1-9]$/.test(event.key) && spawns[Number(event.key) - 1]) {
       spawnAt(spawns[Number(event.key) - 1]);
       return;
@@ -166,7 +168,8 @@
     pointers.clear();
     if (drive) map.dragging.disable(); else map.dragging.enable();
     mapElement.style.touchAction = drive ? "none" : "";
-    modeButton.textContent = drive ? "Touch: steer boat" : "Touch: pan map";
+    modeButton.textContent = drive ? "Mode: Touch steering (tap for keyboard)" : "Mode: Keyboard (tap for touch steering)";
+    if (drive) keysDown.clear();
     modeButton.setAttribute("aria-pressed", String(drive));
   }
   modeButton.addEventListener("click", () => setMode(!dragMode));
