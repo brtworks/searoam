@@ -24,6 +24,32 @@
     title: "Your boat"
   }).addTo(map);
 
+  const spawns = [
+    { name: "San Francisco Bay (water)", lat: 37.82, lng: -122.42, zoom: 14, heading: 0 },
+    { name: "Sydney Harbour (water)", lat: -33.85, lng: 151.25, zoom: 14, heading: 0 },
+    { name: "Mediterranean (open water)", lat: 36.0, lng: 15.0, zoom: 11, heading: 90 },
+    { name: "Atlantic (open water)", lat: 35.0, lng: -40.0, zoom: 10, heading: 90 },
+    { name: "Amsterdam canals", lat: 52.372, lng: 4.893, zoom: 15, heading: 0 },
+    { name: "New York City", lat: 40.7, lng: -74.02, zoom: 14, heading: 0 },
+    { name: "Tokyo Bay", lat: 35.58, lng: 139.85, zoom: 13, heading: 180 },
+    { name: "Venice", lat: 45.435, lng: 12.33, zoom: 15, heading: 90 },
+    { name: "Rio de Janeiro", lat: -22.93, lng: -43.17, zoom: 13, heading: 90 }
+  ];
+  function spawnAt(spot) {
+    position.lat = spot.lat;
+    position.lng = spot.lng;
+    heading = spot.heading;
+    speed = 0;
+    followBoat = true;
+    map.setView([spot.lat, spot.lng], spot.zoom, { animate: false });
+  }
+  const spawnSelect = document.querySelector("#spawn");
+  spawns.forEach((spot, i) => spawnSelect.add(new Option(`${i + 1}. ${spot.name}`, i)));
+  spawnSelect.addEventListener("change", () => {
+    spawnAt(spawns[Number(spawnSelect.value)]);
+    spawnSelect.blur();
+  });
+
   const keysDown = new Set();
   const controls = new Set();
   const speedElement = document.querySelector("#speed");
@@ -62,16 +88,31 @@
     });
   }
 
+  const codeActions = new Map([
+    ["ArrowUp", "forward"], ["KeyW", "forward"], ["ArrowDown", "reverse"], ["KeyS", "reverse"],
+    ["ArrowLeft", "left"], ["KeyA", "left"], ["ArrowRight", "right"], ["KeyD", "right"]
+  ]);
+  const keyCodeActions = new Map([
+    [38, "forward"], [87, "forward"], [40, "reverse"], [83, "reverse"],
+    [37, "left"], [65, "left"], [39, "right"], [68, "right"]
+  ]);
+  const actionFor = (event) =>
+    keyActions.get(event.key) || codeActions.get(event.code) || keyCodeActions.get(event.keyCode);
+
   window.addEventListener("keydown", (event) => {
     if (isEditable(event.target)) return;
-    const action = keyActions.get(event.key);
+    if (/^[1-9]$/.test(event.key) && spawns[Number(event.key) - 1]) {
+      spawnAt(spawns[Number(event.key) - 1]);
+      return;
+    }
+    const action = actionFor(event);
     if (!action) return;
     event.preventDefault();
     keysDown.add(action);
   });
 
   window.addEventListener("keyup", (event) => {
-    const action = keyActions.get(event.key);
+    const action = actionFor(event);
     if (action) keysDown.delete(action);
   });
   window.addEventListener("blur", clearInputs);
@@ -126,7 +167,8 @@
     else if (speed > 0) speed = Math.max(0, speed - 0.7 * elapsed);
     else speed = Math.min(0, speed + 0.7 * elapsed);
 
-    const distance = speed * 0.514444 * elapsed;
+    const zoomScale = Math.pow(2, 14 - map.getZoom()) * 6;
+    const distance = speed * 0.514444 * zoomScale * elapsed;
     const bearing = heading * Math.PI / 180;
     const latitudeRadians = position.lat * Math.PI / 180;
     const earthRadius = 6371000;

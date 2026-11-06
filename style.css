@@ -260,3 +260,6 @@ kbd {
     padding-top: 12px;
   }
 }
+
+.spawn { display: grid; gap: 4px; margin: 10px 0; font-size: 13px; }
+.spawn select { padding: 8px; border-radius: 8px; font-size: 14px; }
