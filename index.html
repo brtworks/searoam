@@ -8,9 +8,9 @@
     <link rel="icon" href="icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script defer src="app.js?v=2"></script>
+    <script defer src="app.js?v=3"></script>
   </head>
   <body>
     <main>
@@ -33,6 +33,13 @@
         <div class="actions">
           <button id="follow" type="button" aria-pressed="true">Following boat</button>
           <button id="reset" type="button">Return to boat</button>
+        </div>
+
+        <label class="spawn">Max speed
+          <input id="max-speed" type="range" min="5" max="400" value="120">
+        </label>
+        <div class="actions">
+          <button id="mode" type="button" aria-pressed="true">Touch: steer boat</button>
         </div>
 
         <label class="spawn">Spawn at

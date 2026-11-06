@@ -32,6 +32,7 @@
     { name: "Amsterdam canals", lat: 52.372, lng: 4.893, zoom: 15, heading: 0 },
     { name: "New York City", lat: 40.7, lng: -74.02, zoom: 14, heading: 0 },
     { name: "Tokyo Bay", lat: 35.58, lng: 139.85, zoom: 13, heading: 180 },
+    { name: "Bosphorus, Istanbul (water)", lat: 41.04, lng: 29.0, zoom: 13, heading: 0 },
     { name: "Venice", lat: 45.435, lng: 12.33, zoom: 15, heading: 90 },
     { name: "Rio de Janeiro", lat: -22.93, lng: -43.17, zoom: 13, heading: 90 }
   ];
@@ -56,6 +57,13 @@
   const courseElement = document.querySelector("#course");
   const positionElement = document.querySelector("#position");
   const followButton = document.querySelector("#follow");
+  const speedSlider = document.querySelector("#max-speed");
+  const modeButton = document.querySelector("#mode");
+  const mapElement = map.getContainer();
+  let maxSpeed = Number(speedSlider.value);
+  let dragMode = true;
+  let drag = null;
+  const pointers = new Map();
   let heading = 0;
   let speed = 0;
   let followBoat = true;
@@ -150,6 +158,42 @@
     followButton.textContent = "Following boat";
   });
 
+  speedSlider.addEventListener("input", () => { maxSpeed = Number(speedSlider.value); });
+
+  function setMode(drive) {
+    dragMode = drive;
+    drag = null;
+    pointers.clear();
+    if (drive) map.dragging.disable(); else map.dragging.enable();
+    mapElement.style.touchAction = drive ? "none" : "";
+    modeButton.textContent = drive ? "Touch: steer boat" : "Touch: pan map";
+    modeButton.setAttribute("aria-pressed", String(drive));
+  }
+  modeButton.addEventListener("click", () => setMode(!dragMode));
+  setMode(true);
+
+  function updateDrag() {
+    if (!dragMode || pointers.size !== 1) { drag = null; return; }
+    drag = [...pointers.values()][0];
+  }
+  mapElement.addEventListener("pointerdown", (event) => {
+    if (!dragMode || event.target.closest(".leaflet-control")) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    mapElement.setPointerCapture(event.pointerId);
+    updateDrag();
+  });
+  mapElement.addEventListener("pointermove", (event) => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    updateDrag();
+  });
+  for (const type of ["pointerup", "pointercancel"]) {
+    mapElement.addEventListener(type, (event) => {
+      pointers.delete(event.pointerId);
+      updateDrag();
+    });
+  }
+
   function active(action) {
     return keysDown.has(action) || controls.has(action);
   }
@@ -158,14 +202,26 @@
     const elapsed = Math.min((time - previousTime) / 1000, 0.1);
     previousTime = time;
 
-    if (active("left")) heading -= 45 * elapsed;
-    if (active("right")) heading += 45 * elapsed;
-    heading = (heading + 360) % 360;
+    const accel = maxSpeed / 3;
+    if (drag) {
+      const rect = mapElement.getBoundingClientRect();
+      const origin = map.latLngToContainerPoint([position.lat, position.lng]);
+      const dx = drag.x - rect.left - origin.x;
+      const dy = drag.y - rect.top - origin.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 12) heading = (Math.atan2(dx, -dy) * 180 / Math.PI + 360) % 360;
+      const target = Math.min(dist / 150, 1) * maxSpeed;
+      speed += Math.sign(target - speed) * Math.min(Math.abs(target - speed), accel * 3 * elapsed);
+    } else {
+      if (active("left")) heading -= 70 * elapsed;
+      if (active("right")) heading += 70 * elapsed;
+      heading = (heading + 360) % 360;
 
-    if (active("forward")) speed = Math.min(speed + 1.8 * elapsed, 8);
-    else if (active("reverse")) speed = Math.max(speed - 1.8 * elapsed, -2);
-    else if (speed > 0) speed = Math.max(0, speed - 0.7 * elapsed);
-    else speed = Math.min(0, speed + 0.7 * elapsed);
+      if (active("forward")) speed = Math.min(speed + accel * elapsed, maxSpeed);
+      else if (active("reverse")) speed = Math.max(speed - accel * elapsed, -maxSpeed / 4);
+      else if (speed > 0) speed = Math.max(0, speed - accel * elapsed);
+      else speed = Math.min(0, speed + accel * elapsed);
+    }
 
     const zoomScale = Math.pow(2, 14 - map.getZoom()) * 6;
     const distance = speed * 0.514444 * zoomScale * elapsed;
