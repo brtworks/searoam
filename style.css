@@ -1,0 +1,262 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #eef7f4;
+  background: #092b35;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+main,
+#map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  overflow: hidden;
+}
+
+main {
+  position: relative;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+  background: #a7d8db;
+}
+
+.panel {
+  position: absolute;
+  z-index: 500;
+  top: 20px;
+  left: 20px;
+  width: min(340px, calc(100vw - 40px));
+  padding: 20px;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 16px;
+  background: rgb(7 34 43 / 94%);
+  box-shadow: 0 12px 40px rgb(3 23 30 / 32%);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 12px;
+  color: #062a34;
+  background: #69e0c0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+  letter-spacing: 0.01em;
+}
+
+.subtitle {
+  margin-top: 3px;
+  color: #a7c3c4;
+  font-size: 12px;
+}
+
+.readouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 10px;
+  margin: 22px 0 16px;
+}
+
+.readouts div:first-child {
+  grid-column: 1 / -1;
+}
+
+.readouts span {
+  display: block;
+  color: #91afb2;
+  font-size: 11px;
+}
+
+.readouts strong {
+  display: block;
+  margin-top: 3px;
+  color: #f3fbf9;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 8px;
+  color: #eaf7f4;
+  background: #153f49;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+button:hover {
+  background: #20545e;
+}
+
+button:focus-visible {
+  outline: 2px solid #69e0c0;
+  outline-offset: 2px;
+}
+
+#follow[aria-pressed="true"] {
+  border-color: #69e0c0;
+  color: #092b35;
+  background: #69e0c0;
+}
+
+.controls {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.controls-title {
+  color: #dcebe8;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.key-guide {
+  display: grid;
+  grid-template-columns: repeat(2, 27px) 1fr;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 0;
+  color: #a7c3c4;
+  font-size: 11px;
+}
+
+kbd {
+  display: grid;
+  height: 25px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 5px;
+  color: #f3fbf9;
+  background: #123942;
+  font: inherit;
+  font-size: 12px;
+}
+
+.controls p {
+  color: #91afb2;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.boat-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 55%));
+  transform-origin: center;
+}
+
+.boat-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.touch-controls {
+  position: absolute;
+  z-index: 500;
+  right: 20px;
+  bottom: 28px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.touch-controls > div {
+  display: grid;
+  gap: 8px;
+}
+
+.touch-controls button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgb(7 34 43 / 90%);
+  font-size: 20px;
+}
+
+.touch-controls button:active,
+.touch-controls button.is-active {
+  color: #092b35;
+  background: #69e0c0;
+}
+
+.map-credit {
+  position: absolute;
+  z-index: 500;
+  right: 0;
+  bottom: 0;
+  padding: 4px 7px;
+  color: #23464b;
+  background: rgb(255 255 255 / 82%);
+  font-size: 10px;
+}
+
+.map-credit a {
+  color: inherit;
+}
+
+@media (pointer: coarse), (max-width: 600px) {
+  .touch-controls {
+    display: flex;
+  }
+
+  .panel {
+    top: 12px;
+    left: 12px;
+    width: min(300px, calc(100vw - 24px));
+    padding: 15px;
+  }
+
+  .readouts {
+    margin: 15px 0 12px;
+  }
+
+  .controls {
+    margin-top: 13px;
+    padding-top: 12px;
+  }
+}
