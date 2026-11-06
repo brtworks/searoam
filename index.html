@@ -8,13 +8,14 @@
     <link rel="icon" href="icon.svg">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script defer src="app.js?v=5"></script>
+    <script defer src="app.js?v=6"></script>
   </head>
   <body>
     <main>
       <div id="map" aria-label="Interactive world map"></div>
+      <button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="true">☰ Menu</button>
       <section class="panel" aria-labelledby="title">
         <div class="brand">
           <span class="brand-mark" aria-hidden="true">⌁</span>
@@ -35,12 +36,14 @@
           <button id="reset" type="button">Return to boat</button>
         </div>
 
-        <label class="spawn">Max speed
-          <input id="max-speed" type="range" min="5" max="400" value="120">
+        <label class="spawn">Max speed: <b id="max-speed-value">120</b> knots
+          <input id="max-speed" type="range" min="5" max="1000" value="120">
         </label>
-        <div class="actions">
-          <button id="mode" type="button" aria-pressed="true">Mode: Touch steering (tap for keyboard)</button>
+        <div class="segmented" role="group" aria-label="Control method">
+          <button id="mode-swipe" type="button" aria-pressed="true">⌨ Keyboard swipe</button>
+          <button id="mode-touch" type="button" aria-pressed="false">☝ Touchscreen</button>
         </div>
+        <div class="debug">Last input: <span id="debug">none yet</span></div>
 
         <label class="spawn">Spawn at
           <select id="spawn" aria-label="Spawn point"></select>

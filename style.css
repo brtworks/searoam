@@ -263,3 +263,11 @@ kbd {
 
 .spawn { display: grid; gap: 4px; margin: 10px 0; font-size: 13px; }
 .spawn select { padding: 8px; border-radius: 8px; font-size: 14px; }
+
+.panel { max-height: calc(100vh - 80px); overflow-y: auto; }
+.panel.is-hidden { display: none; }
+.menu-toggle { position: absolute; z-index: 600; top: 12px; right: 12px; padding: 10px 14px; border-radius: 10px; background: rgb(7 34 43 / 92%); color: #f3fbf9; border: 1px solid #69e0c0; font-size: 15px; }
+.segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+.segmented button { padding: 12px 6px; border-radius: 10px; font-size: 14px; }
+.segmented button[aria-pressed="true"] { color: #092b35; background: #69e0c0; font-weight: 700; }
+.debug { font-size: 12px; opacity: .8; margin-bottom: 8px; word-break: break-all; }

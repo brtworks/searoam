@@ -58,10 +58,20 @@
   const positionElement = document.querySelector("#position");
   const followButton = document.querySelector("#follow");
   const speedSlider = document.querySelector("#max-speed");
-  const modeButton = document.querySelector("#mode");
+  const modeSwipe = document.querySelector("#mode-swipe");
+  const modeTouch = document.querySelector("#mode-touch");
+  const debugElement = document.querySelector("#debug");
+  const speedValue = document.querySelector("#max-speed-value");
+  const panel = document.querySelector(".panel");
+  const menuToggle = document.querySelector("#menu-toggle");
+  const debug = (text) => { debugElement.textContent = text; };
+  menuToggle.addEventListener("click", () => {
+    const hidden = panel.classList.toggle("is-hidden");
+    menuToggle.setAttribute("aria-expanded", String(!hidden));
+  });
   const mapElement = map.getContainer();
   let maxSpeed = Number(speedSlider.value);
-  let dragMode = true;
+  let dragMode = false;
   let drag = null;
   const cruise = true;
   const pointers = new Map();
@@ -121,6 +131,7 @@
   const swipeKeyCodes = new Map([[38, "forward"], [40, "reverse"], [37, "left"], [39, "right"]]);
 
   window.addEventListener("keydown", (event) => {
+    debug(`key ${event.key} code ${event.code} kc ${event.keyCode}`);
     if (isEditable(event.target)) return;
     if (event.key === "m" || event.key === "M") { setMode(!dragMode); return; }
     if (dragMode) return;
@@ -136,6 +147,7 @@
   });
 
   window.addEventListener("wheel", (event) => {
+    debug(`wheel dx ${Math.round(event.deltaX)} dy ${Math.round(event.deltaY)}`);
     if (dragMode || isEditable(event.target)) return;
     event.preventDefault();
     const unit = event.deltaMode === 1 ? 1 : 1 / 40;
@@ -146,6 +158,25 @@
     }
   }, { passive: false });
 
+  // Fallback: swipe gestures that arrive as touch/pointer moves on the page itself.
+  let swipeStart = null;
+  window.addEventListener("scroll", () => debug("scroll event"), true);
+  window.addEventListener("touchstart", (event) => {
+    if (dragMode) return;
+    const t = event.touches[0];
+    swipeStart = { x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  window.addEventListener("touchmove", (event) => {
+    if (dragMode || !swipeStart) return;
+    const t = event.touches[0];
+    const dx = t.clientX - swipeStart.x;
+    const dy = t.clientY - swipeStart.y;
+    if (Math.abs(dx) > 25 || Math.abs(dy) > 25) {
+      if (Math.abs(dx) > Math.abs(dy)) nudge(dx > 0 ? "right" : "left");
+      else nudge(dy < 0 ? "forward" : "reverse");
+      swipeStart = { x: t.clientX, y: t.clientY };
+    }
+  }, { passive: true });
   window.addEventListener("blur", clearInputs);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) clearInputs();
@@ -181,7 +212,10 @@
     followButton.textContent = "Following boat";
   });
 
-  speedSlider.addEventListener("input", () => { maxSpeed = Number(speedSlider.value); });
+  speedSlider.addEventListener("input", () => {
+    maxSpeed = Number(speedSlider.value);
+    speedValue.textContent = speedSlider.value;
+  });
 
   function setMode(drive) {
     dragMode = drive;
@@ -189,12 +223,14 @@
     pointers.clear();
     if (drive) map.dragging.disable(); else map.dragging.enable();
     mapElement.style.touchAction = drive ? "none" : "";
-    modeButton.textContent = drive ? "Mode: Touch steering (tap for keyboard)" : "Mode: Keyboard swipe pad (tap for touch steering)";
+    modeTouch.setAttribute("aria-pressed", String(drive));
+    modeSwipe.setAttribute("aria-pressed", String(!drive));
     if (drive) keysDown.clear();
-    modeButton.setAttribute("aria-pressed", String(drive));
+    
   }
-  modeButton.addEventListener("click", () => setMode(!dragMode));
-  setMode(true);
+  modeSwipe.addEventListener("click", () => setMode(false));
+  modeTouch.addEventListener("click", () => setMode(true));
+  setMode(false);
 
   function updateDrag() {
     if (!dragMode || pointers.size !== 1) { drag = null; return; }
